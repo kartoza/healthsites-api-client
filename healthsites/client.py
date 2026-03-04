@@ -7,8 +7,8 @@ Provides async access to the Healthsites.io API v3.
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Literal
 from pathlib import Path
+from typing import Any, Literal
 
 import httpx
 

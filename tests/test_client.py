@@ -1,7 +1,7 @@
 """Tests for the Healthsites API client."""
 
-import pytest
 import httpx
+import pytest
 import respx
 
 from healthsites import HealthsitesClient
