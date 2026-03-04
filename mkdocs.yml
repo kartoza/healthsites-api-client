@@ -1,0 +1,68 @@
+site_name: Healthsites API Client
+site_url: https://kartoza.github.io/healthsites-api-client
+site_author: Kartoza
+site_description: Python client library for the Healthsites.io API v3
+
+repo_name: kartoza/healthsites-api-client
+repo_url: https://github.com/kartoza/healthsites-api-client
+
+copyright: |
+  Made with love by <a href="https://kartoza.com">Kartoza</a> |
+  <a href="https://github.com/sponsors/kartoza">Donate!</a> |
+  <a href="https://github.com/kartoza/healthsites-api-client">GitHub</a>
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - toc.follow
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            show_category_heading: true
+
+nav:
+  - Home: index.md
+  - User Guide:
+      - Installation: user-guide/installation.md
+      - Quick Start: user-guide/quickstart.md
+      - Examples: user-guide/examples.md
+  - API Reference:
+      - Client: api/client.md
+      - Exceptions: api/exceptions.md
+  - Developer Guide:
+      - Contributing: developer/contributing.md
+      - Development Setup: developer/setup.md
+  - Administrator Guide:
+      - Deployment: admin/deployment.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/kartoza/healthsites-api-client
+    - icon: fontawesome/solid/globe
+      link: https://kartoza.com
