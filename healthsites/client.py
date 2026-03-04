@@ -20,7 +20,6 @@ from healthsites.exceptions import (
     ValidationError,
 )
 
-
 OSMType = Literal["node", "way", "relation"]
 OutputFormat = Literal["json", "geojson", "xml"]
 TagFormat = Literal["osm", "hxl"]
