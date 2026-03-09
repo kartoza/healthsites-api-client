@@ -14,6 +14,7 @@ from healthsites.exceptions import (
     RateLimitError,
     ValidationError,
 )
+from healthsites.tag import Tag
 
 __version__ = "0.1.0"
 __author__ = "Kartoza"
@@ -27,4 +28,5 @@ __all__ = [
     "NotFoundError",
     "RateLimitError",
     "ValidationError",
+    "Tag",
 ]

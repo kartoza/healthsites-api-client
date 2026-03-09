@@ -22,7 +22,7 @@ async def main():
         try:
             # Fetch first page of facilities
             result = await client.list_facilities(
-                country="ZA",
+                country="Indonesia",
                 page=1,
                 output="geojson",
             )
@@ -34,8 +34,9 @@ async def main():
             # Print first 5 facilities
             for i, feature in enumerate(features[:5], 1):
                 props = feature.get("properties", {})
-                name = props.get("name", "Unknown")
-                amenity = props.get("amenity", "Unknown")
+                attributes = props.get("attributes", {})
+                name = attributes.get("name", "Unknown")
+                amenity = attributes.get("amenity", "Unknown")
                 print(f"{i}. {name} ({amenity})")
 
             if len(features) > 5:

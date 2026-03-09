@@ -4,7 +4,7 @@ import httpx
 import pytest
 import respx
 
-from healthsites import HealthsitesClient
+from healthsites import HealthsitesClient, Tag
 from healthsites.exceptions import (
     AuthenticationError,
     NotFoundError,
@@ -22,7 +22,9 @@ def api_key():
 @pytest.fixture
 async def client(api_key):
     """Create a test client."""
-    async with HealthsitesClient(api_key=api_key) as client:
+    async with HealthsitesClient(
+            api_key=api_key, base_url='https://healthsites.io/api/v3'
+    ) as client:
         yield client
 
 
@@ -118,7 +120,8 @@ class TestHealthsitesClient:
     async def test_authentication_error(self, client):
         """Test handling authentication errors."""
         respx.get("https://healthsites.io/api/v3/facilities/").mock(
-            return_value=httpx.Response(401, json={"detail": "Invalid API key"})
+            return_value=httpx.Response(401,
+                                        json={"detail": "Invalid API key"})
         )
 
         with pytest.raises(AuthenticationError):
@@ -140,7 +143,8 @@ class TestHealthsitesClient:
     async def test_rate_limit_error(self, client):
         """Test handling rate limit errors."""
         respx.get("https://healthsites.io/api/v3/facilities/").mock(
-            return_value=httpx.Response(429, json={"detail": "Rate limit exceeded"})
+            return_value=httpx.Response(429,
+                                        json={"detail": "Rate limit exceeded"})
         )
 
         with pytest.raises(RateLimitError):
@@ -151,7 +155,8 @@ class TestHealthsitesClient:
     async def test_validation_error(self, client):
         """Test handling validation errors."""
         respx.get("https://healthsites.io/api/v3/facilities/").mock(
-            return_value=httpx.Response(400, json={"detail": "Invalid parameter"})
+            return_value=httpx.Response(400,
+                                        json={"detail": "Invalid parameter"})
         )
 
         with pytest.raises(ValidationError):
@@ -170,13 +175,14 @@ class TestHealthsitesClient:
             return_value=httpx.Response(200, json=mock_response)
         )
 
-        data = {
-            "type": "Feature",
-            "properties": {"name": "New Facility"},
-            "geometry": {"type": "Point", "coordinates": [28.0, -26.0]},
-        }
-
-        result = await client.create_facility(data)
+        result = await client.create_facility(
+            lat=47.287,
+            lon=8.765,
+            tag=Tag(
+                name="New Facility", amenity='amenity', healthcare='healthcare'
+            ),
+            comment="Test comment",
+        )
 
         assert result["properties"]["name"] == "New Facility"
 
@@ -189,15 +195,20 @@ class TestHealthsitesClient:
             "properties": {"name": "Updated Facility"},
         }
 
-        respx.post("https://healthsites.io/api/v3/facilities/node/123456").mock(
+        respx.post(
+            "https://healthsites.io/api/v3/facilities/node/123456").mock(
             return_value=httpx.Response(200, json=mock_response)
         )
 
-        data = {"properties": {"name": "Updated Facility"}}
         result = await client.update_facility(
             osm_type="node",
             osm_id=123456,
-            data=data,
+            lat=47.287,
+            lon=8.765,
+            tag=Tag(
+                name="Updated Facility", amenity='amenity',
+                healthcare='healthcare'
+            ),
         )
 
         assert result["properties"]["name"] == "Updated Facility"
