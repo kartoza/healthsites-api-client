@@ -7,10 +7,11 @@ Provides async access to the Healthsites.io API v3.
 from __future__ import annotations
 
 import asyncio
-import httpx
 import os
 from pathlib import Path
 from typing import Any, Literal
+
+import httpx
 
 from healthsites.exceptions import (
     AuthenticationError,
@@ -39,10 +40,10 @@ class HealthsitesClient:
     BASE_URL = "https://healthsites.io/api/v3"
 
     def __init__(
-            self,
-            api_key: str,
-            base_url: str | None = None,
-            timeout: float = 30.0,
+        self,
+        api_key: str,
+        base_url: str | None = None,
+        timeout: float = 30.0,
     ):
         """
         Initialize the Healthsites API client.
@@ -53,7 +54,9 @@ class HealthsitesClient:
             timeout: Request timeout in seconds (default: 30.0).
         """
         self.api_key = api_key
-        self.base_url = base_url or f'{os.environ.get("HEALTHSITES_URL")}/api/v3' or self.BASE_URL
+        self.base_url = (
+            base_url or f"{os.environ.get('HEALTHSITES_URL')}/api/v3" or self.BASE_URL
+        )
         self.timeout = timeout
         self._client: httpx.AsyncClient | None = None
 
@@ -77,8 +80,9 @@ class HealthsitesClient:
     def client(self) -> httpx.AsyncClient:
         """Get the HTTP client, creating one if necessary."""
         if self._client is None:
-            self._client = httpx.AsyncClient(timeout=self.timeout,
-                                             headers=self._auth_headers())
+            self._client = httpx.AsyncClient(
+                timeout=self.timeout, headers=self._auth_headers()
+            )
         return self._client
 
     def _handle_response(self, response: httpx.Response) -> Any:
@@ -104,9 +108,9 @@ class HealthsitesClient:
             )
 
     async def _get(
-            self,
-            endpoint: str,
-            params: dict[str, Any] | None = None,
+        self,
+        endpoint: str,
+        params: dict[str, Any] | None = None,
     ) -> Any:
         """Make a GET request to the API."""
         params = {k: v for k, v in (params or {}).items() if v is not None}
@@ -115,9 +119,9 @@ class HealthsitesClient:
         return self._handle_response(response)
 
     async def _post(
-            self,
-            endpoint: str,
-            data: dict[str, Any] | None = None,
+        self,
+        endpoint: str,
+        data: dict[str, Any] | None = None,
     ) -> Any:
         """Make a POST request to the API."""
         url = f"{self.base_url}{endpoint}"
@@ -129,15 +133,15 @@ class HealthsitesClient:
     # -------------------------------------------------------------------------
 
     async def list_facilities(
-            self,
-            page: int = 1,
-            country: str | None = None,
-            extent: str | None = None,
-            from_timestamp: int | None = None,
-            to_timestamp: int | None = None,
-            flat_properties: bool | None = None,
-            tag_format: TagFormat | None = None,
-            output: OutputFormat | None = None,
+        self,
+        page: int = 1,
+        country: str | None = None,
+        extent: str | None = None,
+        from_timestamp: int | None = None,
+        to_timestamp: int | None = None,
+        flat_properties: bool | None = None,
+        tag_format: TagFormat | None = None,
+        output: OutputFormat | None = None,
     ) -> dict[str, Any]:
         """
         List facilities with optional filtering.
@@ -168,13 +172,13 @@ class HealthsitesClient:
         return await self._get("/facilities/", params)
 
     async def create_facility(
-            self,
-            lat: float,
-            lon: float,
-            tag: Tag | dict[str, Any],
-            comment: str | None = None,
-            source: str | None = None,
-            hashtags: str | None = None,
+        self,
+        lat: float,
+        lon: float,
+        tag: Tag | dict[str, Any],
+        comment: str | None = None,
+        source: str | None = None,
+        hashtags: str | None = None,
     ) -> dict[str, Any]:
         """
         Create a new facility.
@@ -204,9 +208,9 @@ class HealthsitesClient:
         return await self._post("/facilities/", data=data)
 
     async def get_facility(
-            self,
-            osm_type: OSMType,
-            osm_id: int,
+        self,
+        osm_type: OSMType,
+        osm_id: int,
     ) -> dict[str, Any]:
         """
         Get a specific facility by OSM type and ID.
@@ -221,15 +225,15 @@ class HealthsitesClient:
         return await self._get(f"/facilities/{osm_type}/{osm_id}")
 
     async def update_facility(
-            self,
-            osm_type: OSMType,
-            osm_id: int,
-            lat: float,
-            lon: float,
-            tag: Tag | dict[str, Any],
-            comment: str | None = None,
-            source: str | None = None,
-            hashtags: str | None = None,
+        self,
+        osm_type: OSMType,
+        osm_id: int,
+        lat: float,
+        lon: float,
+        tag: Tag | dict[str, Any],
+        comment: str | None = None,
+        source: str | None = None,
+        hashtags: str | None = None,
     ) -> dict[str, Any]:
         """
         Update an existing facility.
@@ -261,14 +265,14 @@ class HealthsitesClient:
         return await self._post(f"/facilities/{osm_type}/{osm_id}", data=data)
 
     async def get_statistics(
-            self,
-            country: str | None = None,
-            extent: str | None = None,
-            from_timestamp: int | None = None,
-            to_timestamp: int | None = None,
-            flat_properties: bool | None = None,
-            tag_format: TagFormat | None = None,
-            output: OutputFormat | None = None,
+        self,
+        country: str | None = None,
+        extent: str | None = None,
+        from_timestamp: int | None = None,
+        to_timestamp: int | None = None,
+        flat_properties: bool | None = None,
+        tag_format: TagFormat | None = None,
+        output: OutputFormat | None = None,
     ) -> dict[str, Any]:
         """
         Get facility statistics.
@@ -301,9 +305,9 @@ class HealthsitesClient:
     # -------------------------------------------------------------------------
 
     async def download_shapefile(
-            self,
-            country: str,
-            output_path: str | Path | None = None,
+        self,
+        country: str,
+        output_path: str | Path | None = None,
     ) -> bytes | Path:
         """
         Download shapefile data for a country.
@@ -347,9 +351,9 @@ class HealthsitesClient:
     # -------------------------------------------------------------------------
 
     async def list_all_facilities(
-            self,
-            country: str | None = None,
-            **kwargs,
+        self,
+        country: str | None = None,
+        **kwargs,
     ) -> list[dict[str, Any]]:
         """
         Fetch all facilities across all pages.
@@ -471,14 +475,10 @@ class HealthsitesClientSync:
         """List facilities (sync wrapper)."""
         return self._run(self._async_client.list_facilities(**kwargs))
 
-    def create_facility(
-            self, lat, lon, tag, comment=None, source=None, hashtags=None
-    ):
+    def create_facility(self, lat, lon, tag, comment=None, source=None, hashtags=None):
         """Create facility (sync wrapper)."""
         return self._run(
-            self._async_client.create_facility(
-                lat, lon, tag, comment, source, hashtags
-            )
+            self._async_client.create_facility(lat, lon, tag, comment, source, hashtags)
         )
 
     def get_facility(self, osm_type, osm_id):
@@ -486,8 +486,7 @@ class HealthsitesClientSync:
         return self._run(self._async_client.get_facility(osm_type, osm_id))
 
     def update_facility(
-            self, osm_type, osm_id, lat, lon, tag,
-            comment=None, source=None, hashtags=None
+        self, osm_type, osm_id, lat, lon, tag, comment=None, source=None, hashtags=None
     ):
         """Update facility (sync wrapper)."""
         return self._run(
@@ -502,8 +501,7 @@ class HealthsitesClientSync:
 
     def download_shapefile(self, country, output_path=None):
         """Download shapefile (sync wrapper)."""
-        return self._run(
-            self._async_client.download_shapefile(country, output_path))
+        return self._run(self._async_client.download_shapefile(country, output_path))
 
     def get_user(self):
         """Get user (sync wrapper)."""

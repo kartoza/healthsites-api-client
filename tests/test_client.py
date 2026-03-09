@@ -88,9 +88,7 @@ class TestHealthsitesClient:
         """Test listing facilities."""
         mock_response = {
             "type": "FeatureCollection",
-            "features": [
-                {"type": "Feature", "properties": {"name": "Test Facility"}}
-            ],
+            "features": [{"type": "Feature", "properties": {"name": "Test Facility"}}],
         }
 
         respx.get(f"{BASE_URL}/facilities/").mock(
@@ -171,7 +169,11 @@ class TestHealthsitesClient:
         result = await client.create_facility(
             lat=47.287,
             lon=8.765,
-            tag={"amenity": "clinic", "healthcare": ["doctor"], "name": "Test Facility"},
+            tag={
+                "amenity": "clinic",
+                "healthcare": ["doctor"],
+                "name": "Test Facility",
+            },
         )
 
         assert result["properties"]["name"] == "Test Facility"
