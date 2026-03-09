@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import os
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import httpx
 
@@ -70,7 +70,12 @@ class HealthsitesClient:
         )
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object,
+    ) -> None:
         """Exit async context manager."""
         if self._client:
             await self._client.aclose()
@@ -169,7 +174,7 @@ class HealthsitesClient:
             "tag-format": tag_format,
             "output": output,
         }
-        return await self._get("/facilities/", params)
+        return cast(dict[str, Any], await self._get("/facilities/", params))
 
     async def create_facility(
         self,
@@ -205,7 +210,7 @@ class HealthsitesClient:
             data["source"] = source
         if hashtags is not None:
             data["hashtags"] = hashtags
-        return await self._post("/facilities/", data=data)
+        return cast(dict[str, Any], await self._post("/facilities/", data=data))
 
     async def get_facility(
         self,
@@ -222,7 +227,7 @@ class HealthsitesClient:
         Returns:
             Facility detail data.
         """
-        return await self._get(f"/facilities/{osm_type}/{osm_id}")
+        return cast(dict[str, Any], await self._get(f"/facilities/{osm_type}/{osm_id}"))
 
     async def update_facility(
         self,
@@ -262,7 +267,7 @@ class HealthsitesClient:
             data["source"] = source
         if hashtags is not None:
             data["hashtags"] = hashtags
-        return await self._post(f"/facilities/{osm_type}/{osm_id}", data=data)
+        return cast(dict[str, Any], await self._post(f"/facilities/{osm_type}/{osm_id}", data=data))
 
     async def get_statistics(
         self,
@@ -298,7 +303,7 @@ class HealthsitesClient:
             "tag-format": tag_format,
             "output": output,
         }
-        return await self._get("/facilities/statistic/", params)
+        return cast(dict[str, Any], await self._get("/facilities/statistic/", params))
 
     # -------------------------------------------------------------------------
     # Shapefile Endpoint
@@ -344,7 +349,7 @@ class HealthsitesClient:
         Returns:
             User detail data.
         """
-        return await self._get("/user/")
+        return cast(dict[str, Any], await self._get("/user/"))
 
     # -------------------------------------------------------------------------
     # Convenience Methods
@@ -353,7 +358,7 @@ class HealthsitesClient:
     async def list_all_facilities(
         self,
         country: str | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> list[dict[str, Any]]:
         """
         Fetch all facilities across all pages.
@@ -458,11 +463,11 @@ class HealthsitesClientSync:
         client.close()
     """
 
-    def __init__(self, api_key: str, **kwargs):
+    def __init__(self, api_key: str, **kwargs: Any) -> None:
         """Initialize synchronous client."""
         self._async_client = HealthsitesClient(api_key, **kwargs)
 
-    def _run(self, coro):
+    def _run(self, coro: Any) -> Any:
         """Run async coroutine synchronously."""
         try:
             loop = asyncio.get_event_loop()
@@ -471,50 +476,79 @@ class HealthsitesClientSync:
             asyncio.set_event_loop(loop)
         return loop.run_until_complete(coro)
 
-    def list_facilities(self, **kwargs):
+    def list_facilities(self, **kwargs: Any) -> dict[str, Any]:
         """List facilities (sync wrapper)."""
-        return self._run(self._async_client.list_facilities(**kwargs))
+        return cast(dict[str, Any], self._run(self._async_client.list_facilities(**kwargs)))
 
-    def create_facility(self, lat, lon, tag, comment=None, source=None, hashtags=None):
+    def create_facility(
+        self,
+        lat: float,
+        lon: float,
+        tag: Tag | dict[str, Any],
+        comment: str | None = None,
+        source: str | None = None,
+        hashtags: str | None = None,
+    ) -> dict[str, Any]:
         """Create facility (sync wrapper)."""
-        return self._run(
-            self._async_client.create_facility(lat, lon, tag, comment, source, hashtags)
+        return cast(
+            dict[str, Any],
+            self._run(
+                self._async_client.create_facility(lat, lon, tag, comment, source, hashtags)
+            ),
         )
 
-    def get_facility(self, osm_type, osm_id):
+    def get_facility(self, osm_type: OSMType, osm_id: int) -> dict[str, Any]:
         """Get facility (sync wrapper)."""
-        return self._run(self._async_client.get_facility(osm_type, osm_id))
+        return cast(dict[str, Any], self._run(self._async_client.get_facility(osm_type, osm_id)))
 
     def update_facility(
-        self, osm_type, osm_id, lat, lon, tag, comment=None, source=None, hashtags=None
-    ):
+        self,
+        osm_type: OSMType,
+        osm_id: int,
+        lat: float,
+        lon: float,
+        tag: Tag | dict[str, Any],
+        comment: str | None = None,
+        source: str | None = None,
+        hashtags: str | None = None,
+    ) -> dict[str, Any]:
         """Update facility (sync wrapper)."""
-        return self._run(
-            self._async_client.update_facility(
-                osm_type, osm_id, lat, lon, tag, comment, source, hashtags
-            )
+        return cast(
+            dict[str, Any],
+            self._run(
+                self._async_client.update_facility(
+                    osm_type, osm_id, lat, lon, tag, comment, source, hashtags
+                )
+            ),
         )
 
-    def get_statistics(self, **kwargs):
+    def get_statistics(self, **kwargs: Any) -> dict[str, Any]:
         """Get statistics (sync wrapper)."""
-        return self._run(self._async_client.get_statistics(**kwargs))
+        return cast(dict[str, Any], self._run(self._async_client.get_statistics(**kwargs)))
 
-    def download_shapefile(self, country, output_path=None):
+    def download_shapefile(
+        self, country: str, output_path: str | Path | None = None
+    ) -> bytes | Path:
         """Download shapefile (sync wrapper)."""
-        return self._run(self._async_client.download_shapefile(country, output_path))
+        return cast(
+            bytes | Path,
+            self._run(self._async_client.download_shapefile(country, output_path)),
+        )
 
-    def get_user(self):
+    def get_user(self) -> dict[str, Any]:
         """Get user (sync wrapper)."""
-        return self._run(self._async_client.get_user())
+        return cast(dict[str, Any], self._run(self._async_client.get_user()))
 
-    def list_all_facilities(self, **kwargs):
+    def list_all_facilities(self, **kwargs: Any) -> list[dict[str, Any]]:
         """List all facilities (sync wrapper)."""
-        return self._run(self._async_client.list_all_facilities(**kwargs))
+        return cast(
+            list[dict[str, Any]], self._run(self._async_client.list_all_facilities(**kwargs))
+        )
 
-    def list_endpoints(self):
+    def list_endpoints(self) -> list[dict[str, str]]:
         """List all endpoints."""
         return self._async_client.list_endpoints()
 
-    def close(self):
+    def close(self) -> None:
         """Close the client."""
         self._run(self._async_client.close())
